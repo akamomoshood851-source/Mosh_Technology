@@ -103,9 +103,22 @@ body.light input[type="time"] {
 </div>
 
 <script>
-  let alarms = JSON.parse(localStorage.getItem('alarms')) || []; // Load saved alarms
-  let alarmRinging = false;
-  let audioContext;
+  let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
+let alarmRinging = false;
+let audioContext;
+let alarmSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+alarmSound.loop = true;
+alarmSound.volume = 1.0;
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if(audioUnlocked) return;
+  alarmSound.play().then(() => {
+    alarmSound.pause();
+    alarmSound.currentTime = 0;
+    audioUnlocked = true;
+  }).catch(() => {});
+}
 
   function updateClock() {
     const options = { timeZone: "Africa/Lagos", hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -115,16 +128,21 @@ body.light input[type="time"] {
     document.getElementById("time").textContent = now.toLocaleTimeString('en-US', options);
     document.getElementById("date").textContent = now.toLocaleDateString('en-US', dateOptions);
     
-    // Check all alarms
-    if(!alarmRinging) {
-      const currentHM = now.toLocaleTimeString('en-US', {timeZone: "Africa/Lagos", hour12: false, hour: '2-digit', minute: '2-digit'});
-      if(alarms.includes(currentHM)) {
-        triggerAlarm();
-      }
+   const currentTime = now.toLocaleTimeString('en-US', { timeZone: "Africa/Lagos", hour12: false, hour: '2-digit', minute: '2-digit' });
+alarms.forEach(a => {
+  if(a.time24 === currentTime && !alarmRinging) {
+    alarmRinging = true;
+    alarmSound.play().catch(() => {});
+    if(navigator.vibrate) navigator.vibrate([500,200,500,500,1000]);
+    document.getElementById('alarmStatus').textContent = `⏰ RINGING! ${a.display}`;
+  }
+});
     }
   }
   
   function addAlarm() {
+    unlockAudio();
+    const input = document.getElementById('alarmTime');
     const newAlarm = document.getElementById("alarmTime").value;
     if(newAlarm && !alarms.includes(newAlarm)) {
       alarms.push(newAlarm);
