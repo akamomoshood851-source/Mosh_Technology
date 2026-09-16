@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Digital Clock - Lagos</title>
+<style>
+:root {
+  --bg-dark: #0f172a;
+  --bg-light: #f1f5f9;
+  --text-dark: #38bdf8;
+  --text-light: #0f172a;
+  --card-dark: #1e293b;
+  --card-light: #ffffff;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--bg-dark);
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  transition: background 0.3s;
+}
+body.light {
+  background: var(--bg-light);
+}
+
+.clock { text-align: center; }
+#time {
+  font-size: 6rem;
+  font-weight: bold;
+  color: var(--text-dark);
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px #38bdf8;
+  animation: pulse 1s infinite;
+}
+body.light #time {
+  color: var(--text-light);
+  text-shadow: 0 0 20px #0ea5e9;
+}
+
+#date { font-size: 1.8rem; color: #94a3b8; margin-top: 15px; }
+body.light #date { color: #475569; }
+
+.alarm-box {
+  margin-top: 30px;
+  padding: 20px;
+  background: var(--card-dark);
+  border-radius: 10px;
+  width: 400px;
+  transition: background 0.3s;
+}
+body.light .alarm-box { background: var(--card-light); }
+
+.alarm-item { background: #334155; }
+body.light .alarm-item { background: #e2e8f0; color: #0f172a; }
+
+/* FIXES */
+.alarm-box label { color: #94a3b8; font-size: 1rem; }
+body.light .alarm-box label { color: #475569; }
+
+#location { font-size: 1rem; color: #64748b; margin-top: 5px; }
+body.light #location { color: #475569; }
+
+input[type="time"] { 
+  background: #334155; 
+  color: white; 
+  border: 1px solid #475569; 
+}
+body.light input[type="time"] { 
+  background: #e2e8f0; 
+  color: #0f172a; 
+  border: 1px solid #cbd5e1; 
+}
+
+</style>
+</head>
+<body>
+
+<div class="clock">
+    <button id="themeBtn" onclick="toggleTheme()" style="position:fixed; top:20px; right:20px; 
+    font-size:1.5rem; background:transparent;">🌙</button>
+  <div id="time">00:00:00 AM</div>
+  <div id="date">Loading...</div>
+  <div id="location">Lagos, Nigeria GMT+1</div>
+</div>
+
+<div class="alarm-box">
+  <label>Set Alarm:</label>
+<input type="time" id="alarmTime" step="60" required>
+<button onclick="addAlarm()">Add Alarm</button>
+<button onclick="stopAlarm()">Stop</button>
+  
+  <div class="alarm-list" id="alarmList">
+    <h3 style="margin:10px 0">Saved Alarms:</h3>
+  </div>
+  
+  <p id="alarmStatus" style="color:#38bdf8; font-size:0.9rem"></p>
+</div>
+
+<script>
+  let alarms = JSON.parse(localStorage.getItem('alarms')) || []; // Load saved alarms
+  let alarmRinging = false;
+  let audioContext;
+
+  function updateClock() {
+    const options = { timeZone: "Africa/Lagos", hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const dateOptions = { timeZone: "Africa/Lagos", weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const now = new Date();
+    
+    document.getElementById("time").textContent = now.toLocaleTimeString('en-US', options);
+    document.getElementById("date").textContent = now.toLocaleDateString('en-US', dateOptions);
+    
+    // Check all alarms
+    if(!alarmRinging) {
+      const currentHM = now.toLocaleTimeString('en-US', {timeZone: "Africa/Lagos", hour12: false, hour: '2-digit', minute: '2-digit'});
+      if(alarms.includes(currentHM)) {
+        triggerAlarm();
+      }
+    }
+  }
+  
+  function addAlarm() {
+    const newAlarm = document.getElementById("alarmTime").value;
+    if(newAlarm && !alarms.includes(newAlarm)) {
+      alarms.push(newAlarm);
+      saveAlarms();
+      renderAlarms();
+      document.getElementById("alarmStatus").textContent = `Alarm added for ${newAlarm}`;
+    }
+  }
+  
+  function deleteAlarm(time) {
+    alarms = alarms.filter(a => a !== time);
+    saveAlarms();
+    renderAlarms();
+  }
+  
+  function saveAlarms() {
+    localStorage.setItem('alarms', JSON.stringify(alarms)); // Save to browser
+  }
+  
+  function renderAlarms() {
+    const list = document.getElementById("alarmList");
+    list.innerHTML = "<h3 style='margin:10px 0'>Saved Alarms:</h3>";
+    alarms.forEach(time => {
+      list.innerHTML += `
+        <div class="alarm-item">
+          <span>⏰ ${time}</span>
+          <button onclick="deleteAlarm('${time}')" style="padding:3px 8px;background:#dc2626">X</button>
+        </div>
+      `;
+    });
+  }
+  
+  function playBeep() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.frequency.value = 800;
+    gainNode.gain.value = 0.3;
+    oscillator.connect(gainNode).connect(audioContext.destination);
+    oscillator.start();
+    setTimeout(() => oscillator.stop(), 800);
+    if(alarmRinging) setTimeout(playBeep, 1000);
+  }
+  
+  function triggerAlarm() {
+    alarmRinging = true;
+    document.body.classList.add('alarm-active');
+    playBeep();
+    document.getElementById("alarmStatus").textContent = "🔔 ALARM RING! Click Stop";
+  }
+  
+  function stopAlarm() {
+    alarmRinging = false;
+    document.body.classList.remove('alarm-active');
+    if(audioContext) audioContext.close();
+    document.getElementById("alarmStatus").textContent = "Alarm stopped";
+  }
+  
+  // Load alarms on start
+  renderAlarms();
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Theme Toggle
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isLight ? '🌙' : '☀️';
+}
+
+// Load saved theme on start
+window.onload = () => {
+  const savedTheme = localStorage.getItem('theme');
+  if(savedTheme === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('themeBtn').textContent = '🌙';
+  }
+}
+</script>
+
+</body>
+</html>
