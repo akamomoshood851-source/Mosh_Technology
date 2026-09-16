@@ -1,69 +1,159 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Pro Digital Clock</title>
-<style>body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:system-ui;background:#0f172a;color:#38bdf8}
-.card{background:#1e293b;padding:30px;border-radius:20px;text-align:center;width:90%;max-width:400px}
-#time{font-size:3.5rem;font-weight:800;text-shadow:0 0 15px #38bdf8}
-button{margin:5px;padding:10px 16px;border-radius:20px;border:none;background:#38bdf8;color:#0f172a;font-weight:bold}
-input{padding:7px;border-radius:8px;border:1px solid #334155}
-#alarmList div{display:flex;justify-content:space-between;margin-top:8px;background:#0f172a;padding:8px;border-radius:8px}</style></head>
-<body><div class="card">
-<div id="time">00:00:00</div><div id="ampm" style="font-size:2rem;font-weight:800">AM</div>
-<div id="date">Loading...</div><p style="font-size:.8rem;opacity:.6">Lagos GMT+1</p>
-<div style="margin-top:20px;background:rgba(0,0,0,.2);padding:15px;border-radius:12px">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
+<title>Mosh Technology - Pro Clock & Alarm</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--text:#38bdf8;--accent:#38bdf8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);transition:0.3s}
+.light{--bg:#f1f5f9;--card:#ffffff;--text:#0f172a}
+.card{background:var(--card);padding:28px;border-radius:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.4);width:92%;max-width:420px}
+#time{font-size:3.8rem;font-weight:900;letter-spacing:2px;text-shadow:0 0 20px var(--accent);line-height:1}
+#ampm{font-size:1.8rem;font-weight:800;margin-top:4px}
+#date{margin:12px 0 4px;font-size:1.05rem;opacity:0.9}
+#nextAlarm{margin:8px 0;padding:8px;background:rgba(56,189,248,0.15);border-radius:10px;font-size:0.9rem;min-height:20px}
+.badge{font-size:0.75rem;opacity:0.6;margin-top:6px}
+.controls{margin-top:18px;background:rgba(0,0,0,0.18);padding:16px;border-radius:14px}
+.light.controls{background:rgba(0,0,0,0.05)}
+input[type=time]{padding:10px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:white;font-size:1rem}
+button{margin:5px;padding:10px 16px;border-radius:22px;border:none;background:var(--accent);color:#0f172a;font-weight:800;cursor:pointer;transition:0.2s}
+button:active{transform:scale(0.95)}
+button.danger{background:#ef4444;color:white}
+#alarmList{margin-top:12px;text-align:left}
+#alarmList.item{display:flex;justify-content:space-between;align-items:center;margin-top:8px;background:rgba(0,0,0,0.3);padding:10px 12px;border-radius:10px}
+.ringing{animation:pulse 0.8s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+</style>
+</head>
+<body>
+<div style="position:absolute;top:14px;right:14px"><button onclick="document.documentElement.classList.toggle('light')">🌙/☀️</button></div>
+
+<div class="card" id="mainCard">
+<div id="time">00:00:00</div>
+<div id="ampm">AM</div>
+<div id="date">Loading...</div>
+<div class="badge">Lagos, Nigeria • GMT+1 • Mosh Technology</div>
+<div id="nextAlarm">No alarm set</div>
+
+<div class="controls">
+<div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">
 <input type="time" id="alarmTime">
 <button onclick="addAlarm()">Add Alarm</button>
-<button onclick="stopAlarm()">Stop</button><br>
-<button onclick="testSound()">🔊 Test Sound</button>
-<div id="alarmList"><h3>Saved Alarms:</h3></div>
-<p id="alarmStatus"></p>
-</div></div>
+</div>
+<div style="margin-top:10px">
+<button onclick="testSound()">🔊 Test</button>
+<button class="danger" onclick="stopAlarm()">⏹ Stop</button>
+<button class="danger" onclick="clearAll()">Clear All</button>
+</div>
+<div id="alarmList"><h3 style="text-align:center;margin:10px 0 6px">⏰ Saved Alarms</h3></div>
+<p id="status" style="font-size:0.85rem;min-height:18px;color:#38bdf8;font-weight:600"></p>
+<p style="font-size:0.7rem;opacity:0.5;margin-top:8px">Tip: On iPhone keep screen ON. Flip silent switch OFF. Tap Add to unlock sound.</p>
+</div>
+</div>
+
 <script>
-let alarms=JSON.parse(localStorage.getItem('alarms'))||[];
-let alarmRinging=false;
-let audioCtx;
-let beepTimer;
+let alarms = JSON.parse(localStorage.getItem('mosh_alarms')) || [];
+let alarmRinging = false;
+let audioCtx = null;
+let beepTimer = null;
+let nextAlarmTimer = null;
 
 function getAudio(){
- if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
- if(audioCtx.state==='suspended') audioCtx.resume();
+ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+ if(audioCtx.state === 'suspended') audioCtx.resume();
  return audioCtx;
 }
 function beepOnce(){
- const ctx=getAudio();
- const o=ctx.createOscillator();
- const g=ctx.createGain();
- o.frequency.value=880; o.type='square';
- g.gain.value=0.5;
- o.connect(g); g.connect(ctx.destination);
- o.start(); o.stop(ctx.currentTime+0.4);
+ try{
+  const ctx = getAudio();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.value = 880;
+  osc.type = 'square';
+  gain.gain.setValueAtTime(0.7, ctx.currentTime);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(); osc.stop(ctx.currentTime + 0.35);
+ }catch(e){}
 }
 function startBeeping(){
  if(beepTimer) return;
  beepOnce();
- beepTimer=setInterval(beepOnce,600);
- if(navigator.vibrate) navigator.vibrate([500,200,500,500,1000]);
+ beepTimer = setInterval(beepOnce, 550);
+ if(navigator.vibrate) navigator.vibrate([400,150,400,150,800]);
+ document.getElementById('mainCard').classList.add('ringing');
 }
 function stopAlarm(){
- alarmRinging=false; clearInterval(beepTimer); beepTimer=null;
- document.getElementById('alarmStatus').textContent='Stopped';
+ alarmRinging=false;
+ clearInterval(beepTimer); beepTimer=null;
+ document.getElementById('mainCard').classList.remove('ringing');
+ document.getElementById('status').textContent='⏹ Stopped';
+ if(navigator.vibrate) navigator.vibrate(0);
+ updateNextAlarm();
+}
+function clearAll(){
+ if(!confirm('Delete all alarms?')) return;
+ alarms=[]; localStorage.setItem('mosh_alarms', JSON.stringify(alarms));
+ renderAlarms(); stopAlarm(); updateNextAlarm();
 }
 function updateClock(){
- const now=new Date();
- const t=now.toLocaleTimeString('en-US',{timeZone:"Africa/Lagos",hour12:true});
- const p=t.split(' '); document.getElementById('time').textContent=p[0]; document.getElementById('ampm').textContent=p[1]||'';
- document.getElementById('date').textContent=now.toLocaleDateString('en-US',{timeZone:"Africa/Lagos",weekday:'long',year:'numeric',month:'long',day:'numeric'});
- const cur24=now.toLocaleTimeString('en-US',{timeZone:"Africa/Lagos",hour12:false,hour:'2-digit',minute:'2-digit'});
- alarms.forEach(a=>{ if(a.time24===cur24&&!alarmRinging){ alarmRinging=true; startBeeping(); document.getElementById('alarmStatus').textContent='⏰ RINGING! '+a.display; }});
+ const now = new Date();
+ const timeStr = now.toLocaleTimeString('en-US',{timeZone:"Africa/Lagos",hour12:true});
+ const parts = timeStr.split(' ');
+ document.getElementById('time').textContent = parts[0];
+ document.getElementById('ampm').textContent = parts[1]||'';
+ document.getElementById('date').textContent = now.toLocaleDateString('en-US',{timeZone:"Africa/Lagos",weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ const cur24 = now.toLocaleTimeString('en-US',{timeZone:"Africa/Lagos",hour12:false,hour:'2-digit',minute:'2-digit'});
+ alarms.forEach(a=>{
+  if(a.time24===cur24 &&!alarmRinging){
+   alarmRinging=true;
+   startBeeping();
+   document.getElementById('status').textContent='⏰ RINGING! '+a.display+' - Tap Stop';
+  }
+ });
 }
 function addAlarm(){
- getAudio(); // unlock here!
- const input=document.getElementById('alarmTime'); if(!input.value){alert('Pick time');return;}
- const [h,m]=input.value.split(':'); let hour=parseInt(h); let ampm=hour>=12?'PM':'AM'; let h12=hour%12||12;
- const display=`${String(h12).padStart(2,'0')}:${m} ${ampm}`; const time24=`${String(h).padStart(2,'0')}:${m}`;
- alarms.push({display,time24}); localStorage.setItem('alarms',JSON.stringify(alarms)); renderAlarms(); input.value='';
- document.getElementById('alarmStatus').textContent='✅ Alarm set + Sound unlocked';
+ getAudio();
+ const input=document.getElementById('alarmTime');
+ if(!input.value){ alert('Pick time first'); return; }
+ const [h,m]=input.value.split(':');
+ let hour=parseInt(h); let ampm=hour>=12?'PM':'AM'; let h12=hour%12||12;
+ const display=`${String(h12).padStart(2,'0')}:${m} ${ampm}`;
+ const time24=`${String(h).padStart(2,'0')}:${m}`;
+ if(alarms.some(a=>a.time24===time24)){ document.getElementById('status').textContent='Already set'; return; }
+ alarms.push({display,time24}); localStorage.setItem('mosh_alarms',JSON.stringify(alarms));
+ renderAlarms(); input.value=''; document.getElementById('status').textContent='✅ '+display+' set + Sound unlocked';
+ updateNextAlarm();
 }
-function renderAlarms(){ const l=document.getElementById('alarmList'); l.innerHTML='<h3>Saved Alarms:</h3>'; alarms.forEach((a,i)=>{ l.innerHTML+=`<div><span>⏰ ${a.display}</span><button onclick="alarms.splice(${i},1);localStorage.setItem('alarms',JSON.stringify(alarms));renderAlarms()" style="background:#ef4444;color:white">X</button></div>`; });}
-function testSound(){ getAudio(); alarmRinging=true; startBeeping(); document.getElementById('alarmStatus').textContent='🔊 BEEPING... Tap Stop to stop'; setTimeout(()=>{ if(alarms.length===0) stopAlarm(); },4000); }
-setInterval(updateClock,1000); updateClock(); renderAlarms();
-</script></body></html>
+function renderAlarms(){
+ const list=document.getElementById('alarmList');
+ list.innerHTML='<h3 style="text-align:center;margin:10px 0 6px">⏰ Saved Alarms</h3>';
+ if(alarms.length===0) list.innerHTML+='<p style="text-align:center;opacity:0.5;font-size:0.85rem">No alarms</p>';
+ alarms.forEach((a,i)=>{
+  list.innerHTML+=`<div class="item"><span>⏰ ${a.display}</span><button class="danger" onclick="removeAlarm(${i})">X</button></div>`;
+ });
+}
+function removeAlarm(i){ alarms.splice(i,1); localStorage.setItem('mosh_alarms',JSON.stringify(alarms)); renderAlarms(); updateNextAlarm(); }
+function testSound(){ getAudio(); alarmRinging=true; startBeeping(); document.getElementById('status').textContent='🔊 BEEPING - Tap Stop to stop'; setTimeout(()=>{ if(alarms.length===0) stopAlarm(); },3500); }
+function updateNextAlarm(){
+ if(alarms.length===0){ document.getElementById('nextAlarm').textContent='No alarm set'; return; }
+ const now=new Date(); let minDiff=Infinity; let next=null;
+ alarms.forEach(a=>{
+  const [hh,mm]=a.time24.split(':').map(Number);
+  let d=new Date(); d.setHours(hh,mm,0,0);
+  if(d<now) d.setDate(d.getDate()+1);
+  const diff=d-now; if(diff<minDiff){ minDiff=diff; next={...a,diff}; }
+ });
+ if(next){
+  const hrs=Math.floor(next.diff/3600000); const mins=Math.floor((next.diff%3600000)/60000);
+  document.getElementById('nextAlarm').textContent=`Next: ${next.display} in ${hrs>0?hrs+'h ':''}${mins}m`;
+ }
+}
+
+setInterval(updateClock,1000); updateClock(); renderAlarms(); updateNextAlarm(); setInterval(updateNextAlarm,30000);
+</script>
+</body>
+</html>
