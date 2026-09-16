@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f172a">
 <title>Mosh Technology - Pro Clock & Alarm</title>
+ <link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3652/3652191.png">
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--text:#38bdf8;--accent:#38bdf8}
 *{box-sizing:border-box}
@@ -48,10 +51,12 @@ button.danger{background:#ef4444;color:white}
 <button onclick="testSound()">🔊 Test</button>
 <button class="danger" onclick="stopAlarm()">⏹ Stop</button>
 <button class="danger" onclick="clearAll()">Clear All</button>
+<button id="installBtn" onclick="installApp()" style="display:none;background:#22c55e">📲 Install App</button>
 </div>
 <div id="alarmList"><h3 style="text-align:center;margin:10px 0 6px">⏰ Saved Alarms</h3></div>
 <p id="status" style="font-size:0.85rem;min-height:18px;color:#38bdf8;font-weight:600"></p>
-<p style="font-size:0.7rem;opacity:0.5;margin-top:8px">Tip: On iPhone keep screen ON. Flip silent switch OFF. Tap Add to unlock sound.</p>
+<p style="font-size:0.7rem;opacity:0.5;margin-top:8px">
+ Tip: On iPhone keep screen ON. Flip silent switch OFF. Tap Add to unlock sound.</p>
 </div>
 </div>
 
@@ -105,7 +110,8 @@ function updateClock(){
  const parts = timeStr.split(' ');
  document.getElementById('time').textContent = parts[0];
  document.getElementById('ampm').textContent = parts[1]||'';
- document.getElementById('date').textContent = now.toLocaleDateString('en-US',{timeZone:"Africa/Lagos",weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ document.getElementById('date').textContent = now.toLocaleDateString('en-US',{timeZone:"Africa/Lagos",weekday:'long',year:
+  'numeric',month:'long',day:'numeric'});
  const cur24 = now.toLocaleTimeString('en-US',{timeZone:"Africa/Lagos",hour12:false,hour:'2-digit',minute:'2-digit'});
  alarms.forEach(a=>{
   if(a.time24===cur24 &&!alarmRinging){
@@ -137,7 +143,8 @@ function renderAlarms(){
  });
 }
 function removeAlarm(i){ alarms.splice(i,1); localStorage.setItem('mosh_alarms',JSON.stringify(alarms)); renderAlarms(); updateNextAlarm(); }
-function testSound(){ getAudio(); alarmRinging=true; startBeeping(); document.getElementById('status').textContent='🔊 BEEPING - Tap Stop to stop'; setTimeout(()=>{ if(alarms.length===0) stopAlarm(); },3500); }
+function testSound(){ getAudio(); alarmRinging=true; startBeeping(); document.getElementById('status').
+ textContent='🔊 BEEPING - Tap Stop to stop'; setTimeout(()=>{ if(alarms.length===0) stopAlarm(); },3500); }
 function updateNextAlarm(){
  if(alarms.length===0){ document.getElementById('nextAlarm').textContent='No alarm set'; return; }
  const now=new Date(); let minDiff=Infinity; let next=null;
@@ -154,6 +161,18 @@ function updateNextAlarm(){
 }
 
 setInterval(updateClock,1000); updateClock(); renderAlarms(); updateNextAlarm(); setInterval(updateNextAlarm,30000);
+ 
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e)=>{
+ e.preventDefault(); deferredPrompt=e;
+ document.getElementById('installBtn').style.display='block';
+});
+function installApp(){
+ if(deferredPrompt){ deferredPrompt.prompt(); }
+ else{ alert('On iPhone: Tap Share button ⬆️ then Add to Home Screen'); }
+}
+</script>
 </script>
 </body>
 </html>
