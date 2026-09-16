@@ -34,15 +34,30 @@ input{padding:7px;border-radius:8px;border:1px solid #334155}
 </div>
 
 <script>
-let alarms = JSON.parse(localStorage.getItem('alarms')) || [];
-let alarmRinging = false;
-let alarmSound = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-alarmSound.loop = true;
-let audioUnlocked = false;
+let audioContext;
+function playLoudBeep(){
+  if(!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 1000;
+  gain.gain.value = 1;
+  osc.connect(gain); gain.connect(audioContext.destination);
+  osc.start();
+  setTimeout(()=>{ osc.stop(); if(alarmRinging) playLoudBeep(); },500);
+}
+
+function testSound(){ 
+  alarmRinging=true; 
+  playLoudBeep(); 
+  if(navigator.vibrate) navigator.vibrate([500,200,500]);
+  document.getElementById('alarmStatus').textContent='🔊 BEEPING - HEAR IT?';
+  setTimeout(()=>alarmRinging=false,3000);
+}
 
 function unlockAudio(){
  if(audioUnlocked) return;
- alarmSound.play().then(()=>{alarmSound.pause(); alarmSound.currentTime=0; audioUnlocked=true; document.getElementById('alarmStatus').textContent='✅ Sound unlocked!';}).catch(()=>{});
+  playLoudBeep().then(()=>{alarmSound.pause(); alarmSound.currentTime=0; audioUnlocked=true; document.getElementById('alarmStatus').textContent='✅ Sound unlocked!';}).catch(()=>{});
 }
 
 function updateClock(){
