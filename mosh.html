@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mosh Weekly Study Routine App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EEF1F8;
+    --bg-elevated: #FFFFFF;
+    --bg-inset: #E4E8F3;
+    --text: #1B2340;
+    --text-secondary: #5B6280;
+    --border: rgba(27,35,64,0.12);
+    --maths: #4A63C0;
+    --maths-bg: rgba(74,99,192,0.10);
+    --physics: #1E9E86;
+    --physics-bg: rgba(30,158,134,0.10);
+    --chemistry: #C97A2E;
+    --chemistry-bg: rgba(201,122,46,0.10);
+    --check-bg: #1B2340;
+    --check-text: #EEF1F8;
+    --shadow: 0 1px 2px rgba(27,35,64,0.06), 0 8px 24px rgba(27,35,64,0.06);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12182B;
+      --bg-elevated: #1B2340;
+      --bg-inset: #212B4C;
+      --text: #F3F0E7;
+      --text-secondary: #A9AFC3;
+      --border: rgba(243,240,231,0.10);
+      --maths: #7C9EFF;
+      --maths-bg: rgba(124,158,255,0.14);
+      --physics: #4FD1B5;
+      --physics-bg: rgba(79,209,181,0.14);
+      --chemistry: #F2A65A;
+      --chemistry-bg: rgba(242,166,90,0.14);
+      --check-bg: #F3F0E7;
+      --check-text: #12182B;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 30px rgba(0,0,0,0.35);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #12182B;
+    --bg-elevated: #1B2340;
+    --bg-inset: #212B4C;
+    --text: #F3F0E7;
+    --text-secondary: #A9AFC3;
+    --border: rgba(243,240,231,0.10);
+    --maths: #7C9EFF;
+    --maths-bg: rgba(124,158,255,0.14);
+    --physics: #4FD1B5;
+    --physics-bg: rgba(79,209,181,0.14);
+    --chemistry: #F2A65A;
+    --chemistry-bg: rgba(242,166,90,0.14);
+    --check-bg: #F3F0E7;
+    --check-text: #12182B;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 30px rgba(0,0,0,0.35);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+  }
+
+  header.top {
+    margin-bottom: 28px;
+  }
+
+  .kicker {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 6px;
+    letter-spacing: 0.01em;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(28px, 6vw, 38px);
+    line-height: 1.1;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  /* progress summary */
+  .progress-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin: 24px 0 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .ring {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: conic-gradient(var(--maths) calc(var(--pct, 0) * 1%), var(--bg-inset) 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .ring::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+  }
+  .ring span {
+    position: relative;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .progress-text .label {
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 2px;
+  }
+  .progress-text .detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* day tabs */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 18px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex: 0 0 auto;
+    padding: 9px 15px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+    font-weight: 600;
+  }
+  .tab .tab-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    background: currentColor;
+    opacity: 0.4;
+  }
+  .tab.tab-complete .tab-dot { opacity: 1; background: var(--physics); }
+
+  /* day panel */
+  .day-panel {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .day-panel-head {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .day-panel-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .day-note {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+
+  .block {
+    display: flex;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .block:last-child { border-bottom: none; }
+
+  .checkbox {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-inset);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    transition: all 0.15s ease;
+    padding: 0;
+  }
+  .checkbox svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .checkbox.checked {
+    background: var(--check-bg);
+    border-color: var(--check-bg);
+  }
+  .checkbox.checked svg { opacity: 1; }
+  .checkbox.checked svg path { stroke: var(--check-text); }
+
+  .block-body { flex: 1; min-width: 0; }
+
+  .block-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .time {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chip {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .chip.maths { color: var(--maths); background: var(--maths-bg); }
+  .chip.physics { color: var(--physics); background: var(--physics-bg); }
+  .chip.chemistry { color: var(--chemistry); background: var(--chemistry-bg); }
+  .chip.review { color: var(--text-secondary); background: var(--bg-inset); }
+
+  .task-title {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 2px 0 3px;
+    transition: opacity 0.15s ease, text-decoration-color 0.15s ease;
+  }
+  .task-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin: 0;
+  }
+  .block.done .task-title {
+    text-decoration: line-through;
+    text-decoration-color: var(--text-secondary);
+    opacity: 0.55;
+  }
+  .block.done .task-desc { opacity: 0.55; }
+
+  /* legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 22px;
+    padding: 14px 4px 0;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+  .legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+
+  footer.actions {
+    margin-top: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .reset-btn {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .reset-btn:hover {
+    color: var(--text);
+    border-color: var(--text-secondary);
+  }
+
+  .theme-toggle {
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 4px;
+  }
+
+  @media (max-width: 480px) {
+    .wrap { padding: 28px 16px 48px; }
+    .progress-card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <p class="kicker">IJMB 2026/2027 · Maths, Physics, Chemistry</p>
+    <h1>Mosh Weekly Study Routine App</h1>
+    <p class="sub">Deep focus early, lighter reinforcement later. Tap a day to see its blocks, and check off what you finish — your progress is saved right here in the browser.</p>
+  </header>
+
+  <div class="progress-card">
+    <div class="ring" id="weekRing"><span id="weekRingText">0%</span></div>
+    <div class="progress-text">
+      <p class="label" id="weekLabel">0 of 20 blocks done this week</p>
+      <p class="detail" id="weekDetail">Start with today's morning block while your focus is freshest.</p>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <section class="day-panel" id="dayPanel"></section>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:var(--maths)"></span>Maths</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--physics)"></span>Physics</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--chemistry)"></span>Chemistry</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--text-secondary)"></span>Review / Mixed</div>
+  </div>
+
+  <footer class="actions">
+    <button class="reset-btn" id="resetBtn">Reset this week's progress</button>
+    <button class="theme-toggle" id="themeToggle">Switch to dark</button>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  var DATA = {
+    mon: {
+      label: "Monday", note: "Maths deep-focus day",
+      blocks: [
+        { time: "10:00 – 11:30 AM", subject: "maths", title: "Maths — new topic, deep focus", desc: "Learn the concept fresh, work through examples by hand, then attempt 5–8 practice questions." },
+        { time: "1:00 – 2:30 PM", subject: "physics", title: "Physics — practice questions", desc: "Apply a topic already covered. Time yourself loosely; note anything you get stuck on." },
+        { time: "4:00 – 4:30 PM", subject: "chemistry", title: "Chemistry — quick review", desc: "Flashcards, formula recall, or redo 2–3 questions you got wrong earlier this week." }
+      ]
+    },
+    tue: {
+      label: "Tuesday", note: "Physics deep-focus day",
+      blocks: [
+        { time: "10:00 – 11:30 AM", subject: "physics", title: "Physics — new topic, deep focus", desc: "Learn the concept fresh, work through examples by hand, then attempt 5–8 practice questions." },
+        { time: "1:00 – 2:30 PM", subject: "maths", title: "Maths — practice questions", desc: "Apply a topic already covered. Time yourself loosely; note anything you get stuck on." },
+        { time: "4:00 – 4:30 PM", subject: "chemistry", title: "Chemistry — quick review", desc: "Flashcards, formula recall, or redo 2–3 questions you got wrong earlier this week." }
+      ]
+    },
+    wed: {
+      label: "Wednesday", note: "Maths deep-focus day",
+      blocks: [
+        { time: "10:00 – 11:30 AM", subject: "maths", title: "Maths — new topic, deep focus", desc: "Learn the concept fresh, work through examples by hand, then attempt 5–8 practice questions." },
+        { time: "1:00 – 2:30 PM", subject: "chemistry", title: "Chemistry — practice questions", desc: "Apply a topic already covered. Time yourself loosely; note anything you get stuck on." },
+        { time: "4:00 – 4:30 PM", subject: "physics", title: "Physics — quick review", desc: "Flashcards, formula recall, or redo 2–3 questions you got wrong earlier this week." }
+      ]
+    },
+    thu: {
+      label: "Thursday", note: "Chemistry deep-focus day",
+      blocks: [
+        { time: "10:00 – 11:30 AM", subject: "chemistry", title: "Chemistry — new topic, deep focus", desc: "Learn the concept fresh, work through examples by hand, then attempt 5–8 practice questions." },
+        { time: "1:00 – 2:30 PM", subject: "maths", title: "Maths — practice questions", desc: "Apply a topic already covered. Time yourself loosely; note anything you get stuck on." },
+        { time: "4:00 – 4:30 PM", subject: "physics", title: "Physics — quick review", desc: "Flashcards, formula recall, or redo 2–3 questions you got wrong earlier this week." }
+      ]
+    },
+    fri: {
+      label: "Friday", note: "Maths deep-focus day",
+      blocks: [
+        { time: "10:00 – 11:30 AM", subject: "maths", title: "Maths — new topic, deep focus", desc: "Learn the concept fresh, work through examples by hand, then attempt 5–8 practice questions." },
+        { time: "1:00 – 2:30 PM", subject: "physics", title: "Physics — practice questions", desc: "Apply a topic already covered. Time yourself loosely; note anything you get stuck on." },
+        { time: "4:00 – 4:30 PM", subject: "chemistry", title: "Chemistry — quick review", desc: "Flashcards, formula recall, or redo 2–3 questions you got wrong earlier this week." }
+      ]
+    },
+    sat: {
+      label: "Saturday", note: "Chemistry deep-focus day",
+      blocks: [
+        { time: "10:00 – 11:30 AM", subject: "chemistry", title: "Chemistry — new topic, deep focus", desc: "Learn the concept fresh, work through examples by hand, then attempt 5–8 practice questions." },
+        { time: "1:00 – 2:30 PM", subject: "physics", title: "Physics — practice questions", desc: "Apply a topic already covered. Time yourself loosely; note anything you get stuck on." },
+        { time: "4:00 – 4:30 PM", subject: "maths", title: "Maths — quick review", desc: "Flashcards, formula recall, or redo 2–3 questions you got wrong earlier this week." }
+      ]
+    },
+    sun: {
+      label: "Sunday", note: "No new topics — consolidation day",
+      blocks: [
+        { time: "10:00 AM – 12:00 PM", subject: "review", title: "Timed past-questions set", desc: "Pick one subject (rotate weekly) and do a full past-question set under real exam timing." },
+        { time: "12:30 – 1:00 PM", subject: "review", title: "Review this week's weak-area list", desc: "Go back over everything you struggled with Mon–Sat. Redo the ones you got wrong." }
+      ]
+    }
+  };
+
+  var ORDER = ["mon","tue","wed","thu","fri","sat","sun"];
+  var STORAGE_KEY = "ijmb-routine-progress-v1";
+  var THEME_KEY = "ijmb-routine-theme-v1";
+
+  var state = {};
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : {};
+  } catch (e) { state = {}; }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function todayKey() {
+    var idx = new Date().getDay(); // 0 = Sun
+    var map = ["sun","mon","tue","wed","thu","fri","sat"];
+    return map[idx];
+  }
+
+  var activeDay = todayKey();
+
+  var tabsEl = document.getElementById('tabs');
+  var panelEl = document.getElementById('dayPanel');
+  var ringEl = document.getElementById('weekRing');
+  var ringTextEl = document.getElementById('weekRingText');
+  var weekLabelEl = document.getElementById('weekLabel');
+  var weekDetailEl = document.getElementById('weekDetail');
+
+  var checkIcon = '<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function dayCompletion(dayKey) {
+    var day = DATA[dayKey];
+    var total = day.blocks.length;
+    var done = 0;
+    var d = state[dayKey] || {};
+    for (var i = 0; i < total; i++) { if (d[i]) done++; }
+    return { done: done, total: total };
+  }
+
+  function weekCompletion() {
+    var total = 0, done = 0;
+    ORDER.forEach(function(k) {
+      var c = dayCompletion(k);
+      total += c.total;
+      done += c.done;
+    });
+    return { done: done, total: total };
+  }
+
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    ORDER.forEach(function(k) {
+      var c = dayCompletion(k);
+      var btn = document.createElement('button');
+      btn.className = 'tab' + (k === activeDay ? ' active' : '') + (c.done === c.total ? ' tab-complete' : '');
+      btn.innerHTML = '<span class="tab-dot"></span>' + DATA[k].label.slice(0,3);
+      btn.addEventListener('click', function() {
+        activeDay = k;
+        renderAll();
+      });
+      tabsEl.appendChild(btn);
+    });
+  }
+
+  function renderPanel() {
+    var day = DATA[activeDay];
+    var d = state[activeDay] || {};
+    var html = '';
+    html += '<div class="day-panel-head"><h2>' + day.label + '</h2><span class="day-note">' + day.note + '</span></div>';
+    day.blocks.forEach(function(b, i) {
+      var checked = !!d[i];
+      html += '<div class="block' + (checked ? ' done' : '') + '" data-idx="' + i + '">';
+      html += '<button class="checkbox' + (checked ? ' checked' : '') + '" data-idx="' + i + '" aria-label="Mark done">' + checkIcon + '</button>';
+      html += '<div class="block-body">';
+      html += '<div class="block-top"><span class="time">' + b.time + '</span><span class="chip ' + b.subject + '">' + (b.subject === 'review' ? 'Review' : b.subject.charAt(0).toUpperCase() + b.subject.slice(1)) + '</span></div>';
+      html += '<p class="task-title">' + b.title + '</p>';
+      html += '<p class="task-desc">' + b.desc + '</p>';
+      html += '</div></div>';
+    });
+    panelEl.innerHTML = html;
+
+    var boxes = panelEl.querySelectorAll('.checkbox');
+    boxes.forEach(function(box) {
+      box.addEventListener('click', function() {
+        var idx = box.getAttribute('data-idx');
+        if (!state[activeDay]) state[activeDay] = {};
+        state[activeDay][idx] = !state[activeDay][idx];
+        save();
+        renderAll();
+      });
+    });
+  }
+
+  function renderProgress() {
+    var w = weekCompletion();
+    var pct = w.total ? Math.round((w.done / w.total) * 100) : 0;
+    ringEl.style.setProperty('--pct', pct);
+    ringTextEl.textContent = pct + '%';
+    weekLabelEl.textContent = w.done + ' of ' + w.total + ' blocks done this week';
+    if (w.done === 0) {
+      weekDetailEl.textContent = "Start with today's morning block while your focus is freshest.";
+    } else if (w.done === w.total) {
+      weekDetailEl.textContent = "Full week complete. Great consistency — that's what passes IJMB.";
+    } else {
+      weekDetailEl.textContent = "Keep the streak going — a little every day beats a lot occasionally.";
+    }
+  }
+
+  function renderAll() {
+    renderTabs();
+    renderPanel();
+    renderProgress();
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    if (confirm("Reset all checkmarks for this week?")) {
+      state = {};
+      save();
+      renderAll();
+    }
+  });
+
+  var themeBtn = document.getElementById('themeToggle');
+  function applyTheme(t) {
+    if (t === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeBtn.textContent = 'Switch to light';
+    } else if (t === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      themeBtn.textContent = 'Switch to dark';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      themeBtn.textContent = 'Switch to dark';
+    }
+  }
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
+  applyTheme(savedTheme);
+  themeBtn.addEventListener('click', function() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
