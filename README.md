@@ -13,5 +13,5 @@ Stack: HTML | CSS | JavaScript | PWA
 
 
 - GitHub: @akamomoshood851-source
-- All Projects: https://github.com/akamomoshood851-source# Mosh_Technology
+- All Projects: https://github.com/akamomoshood851-source?tab=respositories
 
