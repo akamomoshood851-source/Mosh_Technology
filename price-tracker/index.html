@@ -1,26 +1,32 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MOSH Price Tracker</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}body{background:#f1f5f9}header{background:#0f172a;color:white;padding:14px 4%;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}.logo i{color:#22c55e}.live{background:#dcfce7;color:#166534;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:20px 4%}.card{background:white;border-radius:18px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,.05);border:1px solid #e2e8f0}.card .icon{width:44px;height:44px;background:#dcfce7;border-radius:12px;display:grid;place-items:center;font-size:20px;margin-bottom:10px}.main{padding:0 4% 30px;display:grid;grid-template-columns:2fr 1fr;gap:18px}@media(max-width:900px){.main{grid-template-columns:1fr}}.chart-card{background:white;border-radius:18px;padding:20px;border:1px solid #e2e8f0}.bar{display:flex;align-items:center;gap:10px;margin:14px 0}.bar-label{width:70px;font-weight:600;font-size:14px}.bar-track{flex:1;height:28px;background:#f1f5f9;border-radius:8px;overflow:hidden}.bar-fill{height:100%;background:#22c55e;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-weight:700;font-size:12px}.side{display:flex;flex-direction:column;gap:18px}.code{background:#0f172a;color:#22c55e;padding:16px;border-radius:12px;font-family:monospace;font-size:12px;line-height:1.8}footer{text-align:center;padding:20px;color:#64748b;font-size:12px}.btn{padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;display:inline-block}.btn-green{background:#22c55e;color:#0f172a}.btn-dark{background:#0f172a;color:white}</style></head><body>
-<header><div class="logo">⬢ MOSH_TECH</div><div style="display:flex;gap:8px"><a href="../" class="btn" style="background:white;color:#0f172a">Home</a><span class="live">● Live • Connected to CLI</span></div></header>
-<div style="padding:20px 4% 0"><h1 style="font-size:36px;font-weight:800">MOSH Price Tracker</h1><p style="color:#64748b;margin-top:6px">Python CLI Project • Real-time market price tracking • Last updated: Today • Lagos Market (NGN)</p></div>
-<div class="grid4">
-<div class="card"><div class="icon">🔒</div><b>Secure Login</b><br><span style="color:#64748b;font-size:13px">JWT auth • Role-based access</span></div>
-<div class="card"><div class="icon">📊</div><b>Excel Export</b><br><span style="color:#64748b;font-size:13px">Download XLSX • Filtered reports</span></div>
-<div class="card"><div class="icon">📈</div><b>Auto Chart</b><br><span style="color:#64748b;font-size:13px">Auto-generate charts • CLI plots</span></div>
-<div class="card"><div class="icon">💬</div><b>WhatsApp Reports</b><br><span style="color:#64748b;font-size:13px">Daily summaries • Instant send</span></div>
-</div>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MOSH Price Tracker - Smart</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}body{background:#f1f5f9}header{background:#0f172a;color:white;padding:14px 4%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}.logo{font-weight:800;font-size:20px}.live{background:#dcfce7;color:#166534;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:20px 4%}.card{background:white;border-radius:18px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,.05);border:1px solid #e2e8f0}.main{padding:0 4% 30px;display:grid;grid-template-columns:2fr 1fr;gap:18px}@media(max-width:900px){.main{grid-template-columns:1fr}}.bar{display:flex;align-items:center;gap:10px;margin:14px 0}.bar-label{width:80px;font-weight:600;font-size:14px}.bar-track{flex:1;height:32px;background:#f1f5f9;border-radius:10px;overflow:hidden;position:relative}.bar-fill{height:100%;background:#22c55e;border-radius:10px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:white;font-weight:800;font-size:13px;transition:width .6s}.btn{padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;display:inline-block}.btn-green{background:#22c55e;color:#0f172a}.btn-dark{background:#0f172a;color:white}.code{background:#0f172a;color:#22c55e;padding:16px;border-radius:12px;font-family:monospace;font-size:12px;line-height:1.8}</style></head><body>
+<header><div class="logo">⬢ MOSH_TECH / Price Tracker</div><div style="display:flex;gap:8px;align-items:center"><a href="../" class="btn" style="background:white;color:#0f172a">Home</a><span id="liveTag" class="live">● Live</span></div></header>
+<div style="padding:20px 4% 0"><h1 style="font-size:36px;font-weight:800">MOSH Price Tracker</h1><p id="subTitle" style="color:#64748b;margin-top:6px">Loading data...</p></div>
+<div class="grid4"><div class="card"><div style="font-size:22px">🔒</div><b>Secure Login</b><br><span style="color:#64748b;font-size:13px">Role-based access</span></div><div class="card"><div style="font-size:22px">📊</div><b>Excel Export</b><br><span style="color:#64748b;font-size:13px">XLSX auto report</span></div><div class="card"><div style="font-size:22px">📈</div><b>Auto Chart</b><br><span style="color:#64748b;font-size:13px">Matplotlib chart</span></div><div class="card"><div style="font-size:22px">💬</div><b>WhatsApp Reports</b><br><span style="color:#64748b;font-size:13px">Daily summary</span></div></div>
 <div class="main">
-<div class="chart-card">
-<h2>Average Market Prices</h2><p style="color:#64748b;font-size:13px;margin-bottom:16px">Updated today • Nigerian Market (NGN) • Data from your Python app</p>
-<img src="MOSH_Chart.png" style="width:100%;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:18px">
-<div class="bar"><div class="bar-label">Beans</div><div class="bar-track"><div class="bar-fill" style="width:100%">₦40,000</div></div></div>
-<div class="bar"><div class="bar-label">Rice</div><div class="bar-track"><div class="bar-fill" style="width:91%">₦36,500</div></div></div>
-<div class="bar"><div class="bar-label">Tomato</div><div class="bar-track"><div class="bar-fill" style="width:19%">₦7,500</div></div></div>
-<div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap"><a href="price_tracker.py" target="_blank" class="btn btn-dark">View Code</a><a href="MOSH_Report.xlsx" class="btn btn-green">Download Excel</a><a href="MOSH_Chart.png" target="_blank" class="btn" style="background:white;border:1px solid #e2e8f0">View Chart PNG</a></div>
+<div class="card"><h2>Average Market Prices</h2><p id="marketInfo" style="color:#64748b;font-size:13px;margin:6px 0 12px"></p><img src="MOSH_Chart.png" style="width:100%;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:10px"><div id="priceBars"></div><div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap"><a href="price_tracker.py" target="_blank" class="btn btn-dark">View Code</a><a href="MOSH_Report.xlsx" class="btn btn-green">Download Excel</a></div></div>
+<div style="display:flex;flex-direction:column;gap:18px"><div class="card"><h3>Quick Stats</h3><div id="statsBox" style="margin-top:12px;font-size:14px;line-height:2.4"></div></div><div class="card"><h3>Python CLI</h3><div class="code" id="codeBox" style="margin-top:10px"></div></div></div>
 </div>
-<div class="side">
-<div class="card"><h3>Quick Stats</h3><div style="margin-top:12px;font-size:14px;line-height:2.2"><div>● Price Trend: +5.2% WoW <b style="color:#22c55e;float:right">+₦1,400</b></div><div>● Top Gainer: Beans +8.1% <b style="color:#22c55e;float:right">+₦3,000</b></div><div>● Most Volatile: Tomato <b style="color:#f59e0b;float:right">±14%</b></div><div>● Items Tracked: 12 <b style="float:right">Overall Avg: ₦28,167</b></div></div></div>
-<div class="card"><h3>Python CLI Command</h3><div class="code" style="margin-top:10px">$ mosh-tracker export --market lagos --format xlsx<br>$ mosh-tracker chart --item beans --period 30d<br><span style="color:#94a3b8"># Login: admin / mosh123</span></div></div>
-<div class="card" style="background:#0f172a;color:white"><h3 style="color:#22c55e">Files in this project</h3><div style="margin-top:10px;font-size:13px;line-height:2">📄 price_tracker.py — Main app<br>📊 MOSH_Report.xlsx — Excel<br>🖼️ MOSH_Chart.png — Chart<br>📖 README.md — Docs</div></div>
-</div>
-</div>
-<footer>MOSH_TECH • v2.6.0 • Python 3.11 • Built with ❤️ in Lagos • <a href="../" style="color:#22c55e">Back to Main Site</a></footer>
-</body></html>
+<footer style="text-align:center;padding:20px;color:#64748b;font-size:12px">MOSH_TECH • Smart Data System • Edit data.js to update</footer>
+<script src="data.js"></script>
+<script>
+// SMART RENDER
+const maxPrice = Math.max(...MOSH_DATA.prices.map(p=>p.price));
+document.getElementById('liveTag').textContent = `● Live • ${MOSH_DATA.lastUpdate}`;
+document.getElementById('subTitle').textContent = `Python CLI Project • ${MOSH_DATA.market} • Last updated: ${MOSH_DATA.lastUpdate}`;
+document.getElementById('marketInfo').textContent = `Updated: ${MOSH_DATA.lastUpdate} • ${MOSH_DATA.market}`;
+
+let barsHTML = '';
+MOSH_DATA.prices.forEach(p=>{
+  let w = (p.price / maxPrice * 100).toFixed(0);
+  barsHTML += `<div class="bar"><div class="bar-label">${p.icon} ${p.name}</div><div class="bar-track"><div class="bar-fill" style="width:${w}%">₦${p.price.toLocaleString()}</div></div></div>`;
+});
+document.getElementById('priceBars').innerHTML = barsHTML;
+
+document.getElementById('statsBox').innerHTML = `
+<div>● Trend: ${MOSH_DATA.stats.trend} <b style="color:#22c55e;float:right">${MOSH_DATA.stats.trendValue}</b></div>
+<div>● Top Gainer: ${MOSH_DATA.stats.topGainer} <b style="color:#22c55e;float:right">${MOSH_DATA.stats.topValue}</b></div>
+<div>● Most Volatile: ${MOSH_DATA.stats.volatile}</div>
+<div>● Items Tracked: ${MOSH_DATA.stats.itemsTracked} <b style="float:right">Avg: ₦${Math.round(MOSH_DATA.prices.reduce((a,b)=>a+b.price,0)/MOSH_DATA.prices.length).toLocaleString()}</b></div>
+`;
+document.getElementById('codeBox').innerHTML = `$ mosh-tracker export --market lagos<br>$ mosh-tracker chart --period 30d<br><span style="color:#94a3b8"># ${MOSH_DATA.contacts.adminUser} | Last: ${MOSH_DATA.lastUpdate}</span>`;
+</script></body></html>
