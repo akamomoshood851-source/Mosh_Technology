@@ -1,0 +1,9 @@
+Rice,35000,Mile 12,2026-09-10
+Rice,38000,Oke-Odo,2026-09-10
+beans,40000,Oke-Odo,2026-09-10
+tomato,10000,Oke-Odo,2026-09-10
+beans,30000,Oja-Oba,2026-09-10
+Rice,40000,Oke-Odo,2026-09-10
+tomato,7000,Oja-Ifo,2026-09-11
+pepper,6000,Mile 12,2026-09-10
+tomato,5000,Mile 12,2026-09-11
